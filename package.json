@@ -1,0 +1,30 @@
+{
+  "name": "defineit",
+  "version": "1.0.0",
+  "description": "Translator",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "telegram",
+    "chatgpt"
+  ],
+  "author": "Nurmuhammet Saryyev <saryyevnd@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "module-alias": "^2.2.2",
+    "openai": "^3.2.1",
+    "telegraf": "^4.12.2"
+  },
+  "_moduleAliases": {
+    "@": "./",
+    "@/*": "/*",
+    "@src": "./src",
+    "@src/*": "./src/*"
+  }
+}
