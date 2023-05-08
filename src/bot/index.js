@@ -1,5 +1,5 @@
 const { Telegraf } = require("telegraf");
-const { fetchWordDefinition } = require("@src/api");
+const { chatgpt } = require("@src/chatgpt");
 const { message } = require("telegraf/filters");
 
 class Bot {
@@ -30,8 +30,14 @@ class Bot {
   async bot_word_handler(ctx) {
     const text = ctx.update.message.text.toUpperCase();
     ctx.reply(`Definition of ${text}`);
-    const response = await fetchWordDefinition(text);
-    const definition = response["content"];
+    const response = await chatgpt.fetchWordDefinitions(text);
+    const choices = response.choices || [];
+
+    const definition = choices.reduce((acc, choice) => {
+      const { message } = choice;
+      return acc + "\n" + message["content"];
+    }, "");
+
     ctx.reply(definition);
   }
 }

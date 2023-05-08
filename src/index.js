@@ -1,5 +1,5 @@
 const utils = require("@src/utils");
-const api = require("@src/api");
+const chatgpt = require("@src/chatgpt");
 const bot = require("@src/bot");
 
-module.exports = { ...utils, ...api, ...bot };
+module.exports = { ...utils, ...chatgpt, ...bot };
