@@ -1,44 +1,15 @@
-const { Telegraf } = require("telegraf");
-const { chatgpt } = require("@src/chatgpt");
-const { message } = require("telegraf/filters");
+const { BotActions } = require("./bot.actions");
 
-class Bot {
-  #token = "";
-  constructor(token = "") {
-    if (Bot.hasToken) {
-      return Bot.instance;
-    }
-
-    Bot.instance = this;
-    Bot.hasToken = true;
-    this.#token = token;
-  }
-
+class Bot extends BotActions {
   start() {
-    const bot = new Telegraf(this.#token);
-    bot.start(this.bot_start_reply);
-    bot.on(message("text"), this.bot_word_handler);
-    bot.launch();
+    this.startReplyMethod();
+    // use middleware
+    this.wordHandlerMethod();
+    this.trainingAction();
+    this.enterNewWordAction();
+    this.bot.launch();
     process.once("SIGINT", () => bot.stop("SIGINT"));
     process.once("SIGTERM", () => bot.stop("SIGTERM"));
-  }
-
-  bot_start_reply(ctx) {
-    ctx.reply("Welcome to DefineIt, I'm happy to help you!");
-  }
-
-  async bot_word_handler(ctx) {
-    const text = ctx.update.message.text.toUpperCase();
-    ctx.reply(`Definition of ${text}`);
-    const response = await chatgpt.fetchWordDefinitions(text);
-    const choices = response.choices || [];
-
-    const definition = choices.reduce((acc, choice) => {
-      const { message } = choice;
-      return acc + "\n" + message["content"];
-    }, "");
-
-    ctx.reply(definition);
   }
 }
 

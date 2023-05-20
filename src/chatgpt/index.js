@@ -8,7 +8,7 @@ class ChatGPT {
   #openai = null;
 
   #getContent(word) {
-    return `Give definition word ${word}, show russian translation and use it in five simple sentences.`;
+    return `Give definition word ${word}, show russian translation and use it in five simple sentences`;
   }
 
   constructor(token = "") {

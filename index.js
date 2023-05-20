@@ -1,18 +1,21 @@
 require("module-alias/register");
+const {
+  TELEGRAM_TOKEN,
+  Bot,
+  restapi,
+  MONGODB_PASSWORD,
+  MONGODB_LOGIN,
+} = require("@src");
+const mongoose = require("mongoose");
 
-const { TELEGRAM_TOKEN, Bot } = require("@src");
-const express = require("express");
-const expressApp = express();
-const port = process.env.PORT || 3000;
-
-expressApp.get("/", (req, res) => {
-  res.send("Welcome to DefineIt!");
-});
-
-expressApp.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
-
+const mongoDbUrl = `mongodb+srv://${MONGODB_LOGIN}:${MONGODB_PASSWORD}@cluster0.dica1nv.mongodb.net/?retryWrites=true&w=majority`;
 const bot = new Bot(TELEGRAM_TOKEN);
 
-bot.start();
+void (async function () {
+  await mongoose.connect(mongoDbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  restapi.start();
+  bot.start();
+})();
