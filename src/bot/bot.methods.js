@@ -1,39 +1,77 @@
 const { BotCore } = require("./bot.core");
-const { chatgpt } = require("@src/chatgpt");
-const { Markup } = require("telegraf");
 const { message } = require("telegraf/filters");
-
-const Buttons = Markup.inlineKeyboard([
-  Markup.button.callback("Train!", "training"),
-  Markup.button.callback("Enter a new word!", "enterNewWord"),
-]);
+const { USERS_WORDS } = require("@src/mock");
+const { chatgpt } = require("@src/chatgpt");
+const { StartButtons } = require("@src/buttons");
 
 class BotMethods extends BotCore {
   startReplyMethod() {
     this.bot.start(async (ctx) => {
-      await ctx.reply("Welcome to DefineIt, I'm happy to help you!");
-      await ctx.reply("Choose what you want!", Buttons);
+      await ctx.reply("Welcome to DefineIt!");
+
+      const menuMsg = await ctx.reply("Menu", StartButtons);
+      this.messages.push(menuMsg.message_id);
+
+      // const { id: userID } = ctx.from;
+      // const words = USERS_WORDS[userID] || [];
+
+      // if (words.length === 0) {
+      //   await ctx.reply("No word available yet!");
+      //   return;
+      // }
+
+      // const { word } = words[0];
+      // const waitMsg = await ctx.reply("Wait please!");
+      // const response = await chatgpt.fetchWordDefinitions(word);
+      // const choices = response.choices || [];
+      // const definition = choices.reduce((acc, choice) => {
+      //   const { message } = choice;
+      //   return acc + "\n" + message["content"];
+      // }, "");
+      // ctx.deleteMessage(waitMsg.message_id);
+      // const definitionMsg = await ctx.reply(definition, StatisticsBtns);
+      // this.messages.push(definitionMsg.message_id);
     });
   }
 
   async wordHandlerMethod() {
     this.bot.on(message("text"), async (ctx) => {
-      this.messages.push(ctx.update.message.message_id);
-      ctx.deleteMessage();
-      if (!this.isListening) return;
-      const text = ctx.update.message.text;
-      const replyText = `Definition of ${text}`;
-      const { message_id: message_id1 } = await ctx.reply(replyText);
-      this.messages.push(message_id1);
-      const response = await chatgpt.fetchWordDefinitions(text);
-      const choices = response.choices || [];
-      const definition = choices.reduce((acc, choice) => {
-        const { message } = choice;
-        return acc + "\n" + message["content"];
-      }, "");
-      const { message_id: message_id2 } = await ctx.reply(definition);
-      this.messages.push(message_id2);
+      switch (this.mode) {
+        case "play":
+          console.log("play");
+          break;
+        case "addNewWord":
+          console.log("addNewWord");
+          break;
+        case "translate":
+          await ctx.deleteMessage();
+          this.clearTranslatedWords(ctx);
+          const word = ctx.update.message.text;
+          const waitingMsg = await ctx.reply(`Translating - ${word}`);
+          const response = await chatgpt.fetchWordDefinitions(word);
+          const choices = response.choices || [];
+          const definition = choices.reduce((acc, choice) => {
+            const { message } = choice;
+            return acc + "\n" + message["content"];
+          }, "");
+          ctx.deleteMessage(waitingMsg.message_id);
+          const definitionMsg = await ctx.reply(definition);
+          this.translatedWords.push(definitionMsg.message_id);
+          break;
+        default:
+          ctx.deleteMessage();
+      }
     });
+  }
+
+  clearMessages(ctx) {
+    this.messages.forEach((i) => ctx.deleteMessage(i));
+    this.messages = [];
+  }
+
+  clearTranslatedWords(ctx) {
+    this.translatedWords.forEach((i) => ctx.deleteMessage(i));
+    this.translatedWords = [];
   }
 }
 
