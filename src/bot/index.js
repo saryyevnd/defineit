@@ -12,6 +12,7 @@ class Bot extends BotActions {
     this.playAction();
     this.addNewWordAction();
     this.translateAction();
+    this.chatgptAction();
 
     this.bot.launch();
     process.once("SIGINT", () => bot.stop("SIGINT"));

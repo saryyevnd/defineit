@@ -55,42 +55,37 @@ class Fetch {
       const response = await axios.get(word);
       const data = response.data;
       const dataString = this.dataToString(data);
-      console.log(dataString.length);
       return dataString.slice(0, 3000);
     } catch {
       return "Word not found!";
     }
   }
 
-  dataToString(datas) {
-    if (Array.isArray(datas)) {
-      const getDefinition = (definitions = []) => {
-        return definitions.reduce((acc, { definition, example }, index) => {
-          return (
-            acc +
-            `  ${index + 1}) definition: ${definition}    ${
-              example ? "\n     example: " + example : ""
-            }\n`
-          );
-        }, "");
-      };
-
-      const datasString = datas.reduce((dataAcc, data) => {
-        const { meanings, word } = data || [];
-        const meaningsString = meanings.reduce(
-          (meaningAcc, { partOfSpeech, definitions, synonyms }) => {
-            const definitionString = getDefinition(definitions);
-            return (
-              meaningAcc + " " + partOfSpeech + "\n" + definitionString + "\n"
-            );
-          },
-          ""
+  dataToString(datas = []) {
+    const getDefinition = (definitions = []) => {
+      return definitions.reduce((acc, { definition, example }, index) => {
+        return (
+          acc +
+          `  ${index + 1}) definition: ${definition}    ${
+            example ? "\n     example: " + example : ""
+          }\n`
         );
-        return dataAcc + `${word} ` + "\n" + meaningsString;
       }, "");
-      return datasString;
-    }
-    return "";
+    };
+
+    return datas.reduce((dataAcc, data) => {
+      const { meanings, word } = data || [];
+      const meaningsString = meanings.reduce(
+        (meaningAcc, { partOfSpeech, definitions, synonyms }) => {
+          const definitionString = getDefinition(definitions);
+          return (
+            meaningAcc + " " + partOfSpeech + "\n" + definitionString + "\n"
+          );
+        },
+        ""
+      );
+      return dataAcc + `${word} ` + "\n" + meaningsString;
+    }, "");
   }
 }
 

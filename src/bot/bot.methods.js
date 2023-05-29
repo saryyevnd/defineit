@@ -6,9 +6,19 @@ const { StartButtons } = require("@src/buttons");
 class BotMethods extends BotCore {
   startReplyMethod() {
     this.bot.start(async (ctx) => {
-      await ctx.reply("Welcome to DefineIt!");
+      ctx.deleteMessage();
+      this.clearMessagesForStart(ctx);
+      this.chatMessagesId.forChangeMode = [];
+      this.chatMessagesId.translatedWords = [];
+      this.mode = "";
+
+      const welcomeMsg = await ctx.reply("Welcome to DefineIt!");
       const menuMsg = await ctx.reply("Menu", StartButtons);
-      this.messages.push(menuMsg.message_id);
+
+      this.chatMessagesId.forChangeMode.push(menuMsg.message_id);
+
+      this.chatMessagesId.all.push(welcomeMsg.message_id);
+      this.chatMessagesId.all.push(menuMsg.message_id);
     });
   }
 
@@ -21,42 +31,61 @@ class BotMethods extends BotCore {
         case "addNewWord":
           console.log("addNewWord");
           break;
+        case "chatgpt":
+          console.log("chatgpt");
+          break;
         case "translate":
           await ctx.deleteMessage();
-          this.clearTextMessages(ctx);
+          this.clearTranslatedWord(ctx);
           const word = ctx.update.message.text;
           const waitingMsg = await ctx.reply(`Translating - ${word}`);
           const definition = await fetch.fetchDefinition(word);
           ctx.deleteMessage(waitingMsg.message_id);
           const definitionMsg = await ctx.reply(definition);
-          this.textMessages.push(definitionMsg.message_id);
+          this.chatMessagesId.translatedWords.push(definitionMsg.message_id);
+          this.chatMessagesId.all.push(definitionMsg.message_id);
           return;
         default:
           ctx.deleteMessage();
       }
     });
+
+    this.bot.on(message("sticker"), (ctx) => {
+      ctx.deleteMessage();
+    });
   }
 
-  clearMessages(ctx) {
-    this.messages.forEach(async (i) => {
+  clearMessagesForStart(ctx) {
+    this.chatMessagesId.all.forEach(async (i) => {
+      try {
+        await ctx.deleteMessage(i);
+      } catch {
+        console.log("Error");
+      }
+    });
+    this.chatMessagesId.all = [];
+  }
+
+  clearMessagesForChangeMode(ctx) {
+    this.chatMessagesId.forChangeMode.forEach(async (i) => {
       try {
         await ctx.deleteMessage(i);
       } catch (e) {
         console.error("Error");
       }
     });
-    this.messages = [];
+    this.chatMessagesId.forChangeMode = [];
   }
 
-  clearTextMessages(ctx) {
-    this.textMessages.forEach(async (i) => {
+  clearTranslatedWord(ctx) {
+    this.chatMessagesId.translatedWords.forEach(async (i) => {
       try {
         await ctx.deleteMessage(i);
       } catch (e) {
         console.error("Error");
       }
     });
-    this.textMessages = [];
+    this.chatMessagesId.translatedWords = [];
   }
 }
 

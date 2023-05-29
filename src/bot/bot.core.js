@@ -14,6 +14,13 @@ class BotCore {
     this.isListening = true;
     this.messages = [];
     this.textMessages = [];
+    this.chatAllMessagesId = [];
+
+    this.chatMessagesId = {
+      all: [],
+      translatedWords: [],
+      forChangeMode: [],
+    };
     this.mode = "";
   }
 }
