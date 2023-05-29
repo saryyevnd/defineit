@@ -1,5 +1,5 @@
 const utils = require("@src/utils");
-const chatgpt = require("@src/chatgpt");
+const api = require("@src/api");
 const bot = require("@src/bot");
 const restapi = require("@src/restapi");
 const buttons = require("@src/buttons");
@@ -7,7 +7,7 @@ const mockData = require("@src/mock");
 
 module.exports = {
   ...utils,
-  ...chatgpt,
+  ...api,
   ...bot,
   ...restapi,
   ...buttons,

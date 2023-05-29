@@ -8,40 +8,41 @@ const { BotMethods } = require("./bot.methods");
 class BotActions extends BotMethods {
   playAction() {
     this.bot.action("play", async (ctx) => {
-      await ctx.answerCbQuery();
-      this.clearMessages(ctx);
-      this.clearTranslatedWords(ctx);
-      this.mode = "play";
-      const captionMsg = await ctx.reply("Menu", PlayButtons);
-      const exclamatoryMsg = await ctx.reply("Let's play!");
-      this.messages.push(captionMsg.message_id);
-      this.messages.push(exclamatoryMsg.message_id);
+      this.actionDefault(ctx, "play", PlayButtons, "Let's play!");
     });
   }
 
   addNewWordAction() {
     this.bot.action("addNewWord", async (ctx) => {
-      await ctx.answerCbQuery();
-      this.clearMessages(ctx);
-      this.clearTranslatedWords(ctx);
-      this.mode = "addNewWord";
-      const captionMsg = await ctx.reply("Menu", AddNewWordButtons);
-      const exclamatoryMsg = await ctx.reply("Now you can add new word!");
-      this.messages.push(captionMsg.message_id);
-      this.messages.push(exclamatoryMsg.message_id);
+      this.actionDefault(
+        ctx,
+        "addNewWord",
+        AddNewWordButtons,
+        "Now you can add new word!"
+      );
     });
   }
 
   translateAction() {
     this.bot.action("translate", async (ctx) => {
-      await ctx.answerCbQuery();
-      this.clearMessages(ctx);
-      this.mode = "translate";
-      const captionMsg = await ctx.reply("Menu", TranslateButtons);
-      const exclamatoryMsg = await ctx.reply("Now you can translate any word!");
-      this.messages.push(captionMsg.message_id);
-      this.messages.push(exclamatoryMsg.message_id);
+      this.actionDefault(
+        ctx,
+        "translate",
+        TranslateButtons,
+        "Now you can translate any word!"
+      );
     });
+  }
+
+  async actionDefault(ctx, mode = "", buttons, caption) {
+    await ctx.answerCbQuery();
+    this.clearMessages(ctx);
+    this.clearTextMessages(ctx);
+    this.mode = mode;
+    const captionMsg = await ctx.reply("Menu", buttons);
+    const exclamatoryMsg = await ctx.reply(caption);
+    this.messages.push(captionMsg.message_id);
+    this.messages.push(exclamatoryMsg.message_id);
   }
 }
 

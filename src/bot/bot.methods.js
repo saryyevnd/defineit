@@ -1,36 +1,14 @@
 const { BotCore } = require("./bot.core");
 const { message } = require("telegraf/filters");
-const { USERS_WORDS } = require("@src/mock");
-const { chatgpt } = require("@src/chatgpt");
+const { fetch } = require("@src/api");
 const { StartButtons } = require("@src/buttons");
 
 class BotMethods extends BotCore {
   startReplyMethod() {
     this.bot.start(async (ctx) => {
       await ctx.reply("Welcome to DefineIt!");
-
       const menuMsg = await ctx.reply("Menu", StartButtons);
       this.messages.push(menuMsg.message_id);
-
-      // const { id: userID } = ctx.from;
-      // const words = USERS_WORDS[userID] || [];
-
-      // if (words.length === 0) {
-      //   await ctx.reply("No word available yet!");
-      //   return;
-      // }
-
-      // const { word } = words[0];
-      // const waitMsg = await ctx.reply("Wait please!");
-      // const response = await chatgpt.fetchWordDefinitions(word);
-      // const choices = response.choices || [];
-      // const definition = choices.reduce((acc, choice) => {
-      //   const { message } = choice;
-      //   return acc + "\n" + message["content"];
-      // }, "");
-      // ctx.deleteMessage(waitMsg.message_id);
-      // const definitionMsg = await ctx.reply(definition, StatisticsBtns);
-      // this.messages.push(definitionMsg.message_id);
     });
   }
 
@@ -45,19 +23,14 @@ class BotMethods extends BotCore {
           break;
         case "translate":
           await ctx.deleteMessage();
-          this.clearTranslatedWords(ctx);
+          this.clearTextMessages(ctx);
           const word = ctx.update.message.text;
           const waitingMsg = await ctx.reply(`Translating - ${word}`);
-          const response = await chatgpt.fetchWordDefinitions(word);
-          const choices = response.choices || [];
-          const definition = choices.reduce((acc, choice) => {
-            const { message } = choice;
-            return acc + "\n" + message["content"];
-          }, "");
+          const definition = await fetch.fetchDefinition(word);
           ctx.deleteMessage(waitingMsg.message_id);
           const definitionMsg = await ctx.reply(definition);
-          this.translatedWords.push(definitionMsg.message_id);
-          break;
+          this.textMessages.push(definitionMsg.message_id);
+          return;
         default:
           ctx.deleteMessage();
       }
@@ -65,13 +38,25 @@ class BotMethods extends BotCore {
   }
 
   clearMessages(ctx) {
-    this.messages.forEach((i) => ctx.deleteMessage(i));
+    this.messages.forEach(async (i) => {
+      try {
+        await ctx.deleteMessage(i);
+      } catch (e) {
+        console.error("Error");
+      }
+    });
     this.messages = [];
   }
 
-  clearTranslatedWords(ctx) {
-    this.translatedWords.forEach((i) => ctx.deleteMessage(i));
-    this.translatedWords = [];
+  clearTextMessages(ctx) {
+    this.textMessages.forEach(async (i) => {
+      try {
+        await ctx.deleteMessage(i);
+      } catch (e) {
+        console.error("Error");
+      }
+    });
+    this.textMessages = [];
   }
 }
 

@@ -13,7 +13,7 @@ class BotCore {
     this.bot = new Telegraf(this.token);
     this.isListening = true;
     this.messages = [];
-    this.translatedWords = [];
+    this.textMessages = [];
     this.mode = "";
   }
 }
