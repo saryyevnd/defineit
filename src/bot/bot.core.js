@@ -22,6 +22,7 @@ class BotCore {
       addNewWord: [],
     };
     this.mode = "";
+    this.modes = ["play", "translate", "chatgpt", "addNewWord", "changeMode"];
   }
 
   async reply(ctx = {}, ...rest) {

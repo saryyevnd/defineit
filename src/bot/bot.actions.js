@@ -7,6 +7,18 @@ const {
 const { BotMethods } = require("./bot.methods");
 
 class BotActions extends BotMethods {
+  async actionDefault(ctx, mode = "", buttons, caption) {
+    await ctx.answerCbQuery();
+    this.modes.forEach(async (key) => await this.clearMessagesByMode(ctx, key));
+    this.mode = mode;
+
+    const menuMsg = await this.reply(ctx, "Menu", buttons);
+    const exclamatoryMsg = await this.reply(ctx, caption);
+
+    this.chatMessagesId.changeMode.push(menuMsg.message_id);
+    this.chatMessagesId.changeMode.push(exclamatoryMsg.message_id);
+  }
+
   playAction() {
     this.bot.action("play", async (ctx) => {
       this.actionDefault(ctx, "play", PlayButtons, "Let's play!");
@@ -34,6 +46,7 @@ class BotActions extends BotMethods {
       );
     });
   }
+
   chatgptAction() {
     this.bot.action("chatgpt", async (ctx) => {
       this.actionDefault(
@@ -43,23 +56,6 @@ class BotActions extends BotMethods {
         "Now you can use chatgpt!"
       );
     });
-  }
-
-  async actionDefault(ctx, mode = "", buttons, caption) {
-    await ctx.answerCbQuery();
-    this.clearChangeMode(ctx);
-    this.clearTranslate(ctx);
-    this.clearChatgpt(ctx);
-
-    this.mode = mode;
-    const captionMsg = await ctx.reply("Menu", buttons);
-    const exclamatoryMsg = await ctx.reply(caption);
-    this.chatMessagesId.changeMode.push(captionMsg.message_id);
-    this.chatMessagesId.changeMode.push(exclamatoryMsg.message_id);
-
-    this.chatMessagesId.all.push(captionMsg.message_id);
-    this.chatMessagesId.all.push(exclamatoryMsg.message_id);
-    11;
   }
 }
 

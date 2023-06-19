@@ -1,13 +1,13 @@
-const { BotCore } = require("./bot.core");
 const { message } = require("telegraf/filters");
 const { fetch } = require("@src/api");
 const { StartButtons } = require("@src/buttons");
 const { User } = require("@src/models");
+const { BotClear } = require("./bot.clear");
 
-class BotMethods extends BotCore {
+class BotMethods extends BotClear {
   startReplyMethod() {
     this.bot.start(async (ctx) => {
-      this.clearChat(ctx);
+      await this.clearChat(ctx);
       Object.keys(this.chatMessagesId).forEach(
         (key) => (this.chatMessagesId[key] = [])
       );
@@ -62,7 +62,7 @@ class BotMethods extends BotCore {
           this.deleteMessage(ctx, waitingMsgId);
           break;
         case "chatgpt":
-          this.clearChatgpt(ctx);
+          this.clearMessagesByMode(ctx, this.mode);
           const response = await fetch.fetchChatGptRespoonse(text);
           const choices = response?.choices || [];
           const content = choices.reduce((acc, choice) => {
@@ -75,7 +75,7 @@ class BotMethods extends BotCore {
           this.deleteMessage(ctx, waitingMsgId);
           break;
         case "translate":
-          this.clearTranslate(ctx);
+          this.clearMessagesByMode(ctx, this.mode);
           const definition = await fetch.fetchDefinition(text);
           const definitionMsg = await ctx.reply(definition);
           this.chatMessagesId.translate.push(definitionMsg.message_id);
@@ -94,57 +94,6 @@ class BotMethods extends BotCore {
     this.bot.on(message("sticker"), (ctx) => {
       ctx.deleteMessage();
     });
-  }
-
-  deleteMessage(ctx, msgId) {
-    try {
-      if (msgId) {
-        ctx.deleteMessage(msgId);
-        return;
-      }
-      ctx.deleteMessage();
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  async clearChat(ctx) {
-    this.deleteMessage(ctx);
-    this.chatMessagesId.all.forEach(async (i) => {
-      try {
-        await ctx.deleteMessage(i);
-      } catch (error) {
-        console.log(error.message);
-      }
-    });
-    this.chatMessagesId.all = [];
-  }
-
-  async clearMessages(ctx, key) {
-    this.chatMessagesId[key].forEach(async (i) => {
-      try {
-        await ctx.deleteMessage(i);
-      } catch (error) {
-        console.log(error.message);
-      }
-    });
-    this.chatMessagesId[key] = [];
-  }
-
-  clearPlay(ctx) {
-    this.clearMessages(ctx, "play");
-  }
-
-  clearChangeMode(ctx) {
-    this.clearMessages(ctx, "changeMode");
-  }
-
-  clearTranslate(ctx) {
-    this.clearMessages(ctx, "translate");
-  }
-
-  clearChatgpt(ctx) {
-    this.clearMessages(ctx, "chatgpt");
   }
 }
 
