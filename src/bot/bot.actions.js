@@ -47,13 +47,15 @@ class BotActions extends BotMethods {
 
   async actionDefault(ctx, mode = "", buttons, caption) {
     await ctx.answerCbQuery();
-    this.clearMessagesForChangeMode(ctx);
-    this.clearTranslatedWord(ctx);
+    this.clearChangeMode(ctx);
+    this.clearTranslate(ctx);
+    this.clearChatgpt(ctx);
+
     this.mode = mode;
     const captionMsg = await ctx.reply("Menu", buttons);
     const exclamatoryMsg = await ctx.reply(caption);
-    this.chatMessagesId.forChangeMode.push(captionMsg.message_id);
-    this.chatMessagesId.forChangeMode.push(exclamatoryMsg.message_id);
+    this.chatMessagesId.changeMode.push(captionMsg.message_id);
+    this.chatMessagesId.changeMode.push(exclamatoryMsg.message_id);
 
     this.chatMessagesId.all.push(captionMsg.message_id);
     this.chatMessagesId.all.push(exclamatoryMsg.message_id);

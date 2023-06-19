@@ -43,11 +43,19 @@ class Fetch {
     }
   }
 
-  async fetchWordDefinitions(word = "") {
-    // const response = await this.#openai.createChatCompletion({
-    //   model: this.#model,
-    //   messages: [{ role: "user", content: this.#getContent(word) }],
-    // });
+  async fetchChatGptRespoonse(content) {
+    console.log(this.#chatgptModel);
+    console.log(this.#token);
+    console.log(content);
+    try {
+      const response = await this.#openai.createChatCompletion({
+        model: this.#chatgptModel,
+        messages: [{ role: "user", content }],
+      });
+      return response.data;
+    } catch (error) {
+      console.log("Error: ", error.message);
+    }
   }
 
   async fetchDefinition(word) {

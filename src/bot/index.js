@@ -9,6 +9,7 @@ class Bot extends BotActions {
     // });
     // use middleware
     this.wordHandlerMethod();
+    // actions
     this.playAction();
     this.addNewWordAction();
     this.translateAction();

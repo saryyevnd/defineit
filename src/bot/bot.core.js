@@ -9,19 +9,25 @@ class BotCore {
 
     BotCore.instance = this;
     BotCore.hasToken = true;
+
     this.token = token;
     this.bot = new Telegraf(this.token);
-    this.isListening = true;
-    this.messages = [];
-    this.textMessages = [];
-    this.chatAllMessagesId = [];
 
     this.chatMessagesId = {
       all: [],
-      translatedWords: [],
-      forChangeMode: [],
+      changeMode: [],
+      play: [],
+      translate: [],
+      chatgpt: [],
+      addNewWord: [],
     };
     this.mode = "";
+  }
+
+  async reply(ctx = {}, ...rest) {
+    const message = await ctx.reply(...rest);
+    this.chatMessagesId.all.push(message.message_id);
+    return message;
   }
 }
 
