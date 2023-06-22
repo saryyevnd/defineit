@@ -1,1 +1,1 @@
-web: npm run build && npm start --bind :$PORT
+web: npm start --bind :$PORT
