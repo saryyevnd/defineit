@@ -23,6 +23,13 @@ class BotCore {
     };
     this.mode = "";
     this.modes = ["play", "translate", "chatgpt", "addNewWord", "changeMode"];
+
+    this.currentWord = { showTime: null, word: null };
+    this.timeIncrements = {
+      "1day": 24 * 60 * 60 * 1000,
+      "6hours": 6 * 60 * 60 * 1000,
+      "1hour": 60 * 60 * 1000,
+    };
   }
 
   async reply(ctx = {}, ...rest) {

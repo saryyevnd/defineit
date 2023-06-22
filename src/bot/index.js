@@ -3,17 +3,18 @@ const { BotActions } = require("./bot.actions");
 class Bot extends BotActions {
   start() {
     this.startReplyMethod();
-    // this.bot.use(async (ctx, next) => {
-    //   console.log("this.mode");
-    //   await next();
-    // });
-    // use middleware
-    this.wordHandlerMethod();
-    // actions
+    // Here you can register midllewares
+    this.textMessageHanlerMethod();
+
+    // Menu button actions
     this.playAction();
     this.addNewWordAction();
     this.translateAction();
     this.chatgptAction();
+
+    //
+    this.showDefinitionAction();
+    this.statisticsActions();
 
     this.bot.launch();
     process.once("SIGINT", () => bot.stop("SIGINT"));

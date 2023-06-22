@@ -37,12 +37,14 @@ const ChatGptButtons = inlineKeyboard([
   [TranslateBtn],
 ]);
 
-const StatisticsButtons = [
-  button.callback("Easy", "easy"),
-  button.callback("Medium", "medium"),
-  button.callback("Hard", "hard"),
-  button.callback("Done", "done"),
-];
+const StatisticsButtons = inlineKeyboard([
+  [button.callback("Easy", "easy"), button.callback("Medium", "medium")],
+  [button.callback("Hard", "hard"), button.callback("Remove", "remove")],
+]);
+
+const showDefinitionButton = inlineKeyboard([
+  [button.callback("Show definition", "showDefinition")],
+]);
 
 module.exports = {
   StartButtons,
@@ -51,4 +53,5 @@ module.exports = {
   TranslateButtons,
   StatisticsButtons,
   ChatGptButtons,
+  showDefinitionButton,
 };

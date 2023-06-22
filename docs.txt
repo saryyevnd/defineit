@@ -1,0 +1,61 @@
+1. Start application
+	- Clear all messages and reset all properties
+	
+	- Reply with welcome message
+	
+	- Send menu to user (Play,addNewWord,translate,chatgpt)
+	
+	- Check DB if user exists
+		a. if yes complete function
+		b. if no create new user with new user id
+		
+2. Text message handling
+	- Delete first text message
+	
+	- Transform text message to upper case
+
+	- send Wait! preloader message
+
+	- Save preloader id in object property
+
+	- Find out which method should work, if mode:
+
+		- play:
+
+		- addNewWord:
+
+		- chatgpt:
+
+		- translate:
+	
+	otherwise just remove text message and preloader message.
+
+3. Menu buttons handling
+	- Remove all messages by mode and reset properties
+
+	- set new mode
+
+	- send buton and send exclamatory message for new mode and save messages 
+	id in changeMode array
+
+	- In addition for each mode:
+
+		- play:
+			- Find user from database by id
+
+			- Assign user's words
+
+			- Take lastWord
+
+			- Check if lastWord doesn't exists 
+			or last words showTime property more than current timestamp return 
+			message Now no word available!"
+
+			- Send word to user and showDefineButton and messages id in play array
+
+		- addNewWord:
+			over
+		- chatgpt:
+			over
+		- translate:
+			over
