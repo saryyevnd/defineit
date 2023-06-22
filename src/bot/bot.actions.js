@@ -33,11 +33,12 @@ class BotActions extends BotMethods {
         PlayButtons,
         "Let's play!"
       );
-      await this.textHandler(ctx);
+      await this.showAvailableWord(ctx);
     });
   }
 
-  async textHandler(ctx) {
+  async showAvailableWord(ctx) {
+    this.deleteMessagesByMode(ctx, this.mode);
     const telegramUser = ctx.from;
     const mongoUser = await User.findOne({ userId: telegramUser.id });
     const words = mongoUser.words;
@@ -45,7 +46,7 @@ class BotActions extends BotMethods {
 
     if (!lastWord || lastWord.showTime > Date.now()) {
       const noWordMsg = await this.reply(ctx, "No word available!");
-      this.chatMessagesId.play.push(noWordMsg.message_id);
+      this.chatMessagesId[this.mode].push(noWordMsg.message_id);
       return;
     }
     this.currentWord = lastWord;
@@ -54,7 +55,7 @@ class BotActions extends BotMethods {
       capitalize(lastWord.word),
       showDefinitionButton
     );
-    this.chatMessagesId.play.push(wordMsg.message_id);
+    this.chatMessagesId[this.mode].push(wordMsg.message_id);
   }
 
   showDefinitionAction() {
@@ -71,24 +72,32 @@ class BotActions extends BotMethods {
     });
   }
 
-  // easy - 1day
-  // medium - 6hours
-  // hard - 1hour
-
   async statisticsActions() {
     this.bot.action("easy", async (ctx) => {
       await this.handleStatisticButtons(ctx, this.timeIncrements["1day"]);
-      await this.wordHandler(ctx);
+      await this.showAvailableWord(ctx);
     });
+
     this.bot.action("medium", async (ctx) => {
       await this.handleStatisticButtons(ctx, this.timeIncrements["6hours"]);
-      await this.wordHandler(ctx);
+      await this.showAvailableWord(ctx);
     });
+
     this.bot.action("hard", async (ctx) => {
       await this.handleStatisticButtons(ctx, this.timeIncrements["1hour"]);
-      await this.wordHandler(ctx);
+      await this.showAvailableWord(ctx);
     });
-    this.bot.action("remove", async (ctx) => {});
+
+    this.bot.action("remove", async (ctx) => {
+      const telegramUser = ctx.from;
+      const mongoUser = await User.findOne({ userId: telegramUser.id });
+      mongoUser.words = mongoUser.words.filter(
+        (item) => item.word !== this.currentWord.word
+      );
+      mongoUser.words = mongoUser.words.sort((a, b) => b.showTime - a.showTime);
+      await mongoUser.save();
+      await this.showAvailableWord(ctx);
+    });
   }
 
   async handleStatisticButtons(ctx, addTime = 3_600_000) {
@@ -97,9 +106,9 @@ class BotActions extends BotMethods {
     const word = mongoUser.words.find(
       (item) => item.word === this.currentWord.word
     );
-    word.showTime += addTime;
-    mongoUser.words = mongoUser.words.sort((a, b) => a.showTime - b.showTime);
-    mongoUser.save();
+    word.showTime = Date.now() + addTime;
+    mongoUser.words = mongoUser.words.sort((a, b) => b.showTime - a.showTime);
+    await mongoUser.save();
   }
 
   addNewWordAction() {

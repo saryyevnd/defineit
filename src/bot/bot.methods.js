@@ -40,6 +40,8 @@ class BotMethods extends BotClear {
 
       switch (this.mode) {
         case "play":
+          this.deleteMessage(ctx);
+          this.deleteMessage(ctx, this.preloaderId);
           return;
         case "addNewWord":
           return await this.addNewWordHandler(ctx, text);
@@ -63,6 +65,7 @@ class BotMethods extends BotClear {
 
       const telegramUser = ctx.from;
       const mongoUser = await User.findOne({ userId: telegramUser.id });
+      const addNewWordMsgIds = this.chatMessagesId[this.mode];
 
       // Check database if word exists
       const words = mongoUser.words;
@@ -73,10 +76,11 @@ class BotMethods extends BotClear {
           ctx,
           `${text} already exists on Database!`
         );
-        this.chatMessagesId.addNewWord.push(includesMsg.message_id);
+        addNewWordMsgIds.push(includesMsg.message_id);
         this.deleteMessage(ctx, this.preloaderId);
         return;
       }
+
       // Check enlish dictionary if word exists
       const { doesWordExist } = await fetch.wordValidation(text);
       if (!doesWordExist) {
@@ -84,16 +88,16 @@ class BotMethods extends BotClear {
           ctx,
           `${text} doesn't exists on English dictionary!`
         );
-        this.chatMessagesId.addNewWord.push(doesExistsMsg.message_id);
+        addNewWordMsgIds.push(doesExistsMsg.message_id);
         this.deleteMessage(ctx, this.preloaderId);
         return;
       }
 
       words.push({ showTime: Date.now(), word: text });
-      mongoUser.words = words.sort((a, b) => a.showTime - b.showTime);
+      mongoUser.words = words.sort((a, b) => b.showTime - a.showTime);
       mongoUser.save();
       const successMsg = await this.reply(ctx, `${text} successfully saved!`);
-      this.chatMessagesId.addNewWord.push(successMsg.message_id);
+      addNewWordMsgIds.push(successMsg.message_id);
       this.deleteMessage(ctx, this.preloaderId);
       return;
     } catch (error) {
@@ -111,9 +115,9 @@ class BotMethods extends BotClear {
       const { message } = choice;
       return acc + "\n" + message["content"];
     }, "");
-    const contentMsg = await ctx.reply(content);
-    this.chatMessagesId.chatgpt.push(contentMsg.message_id);
-    this.chatMessagesId.all.push(contentMsg.message_id);
+    const contentMsg = await this.reply(ctx, content);
+    this.chatMessagesId[this.mode].push(contentMsg.message_id);
+
     this.deleteMessage(ctx, this.preloaderId);
   }
 
@@ -121,7 +125,7 @@ class BotMethods extends BotClear {
     this.deleteMessagesByMode(ctx, this.mode);
     const definition = await fetch.fetchDefinition(text);
     const definitionMsg = await this.reply(ctx, definition, buttons);
-    this.chatMessagesId.translate.push(definitionMsg.message_id);
+    this.chatMessagesId[this.mode].push(definitionMsg.message_id);
     this.deleteMessage(ctx, this.preloaderId);
   }
 }

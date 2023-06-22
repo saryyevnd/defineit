@@ -6,56 +6,97 @@
 	- Send menu to user (Play,addNewWord,translate,chatgpt)
 	
 	- Check DB if user exists
-		a. if yes complete function
-		b. if no create new user with new user id
+		- If yes complete function
+
+		- If no create new user with new user id
 		
 2. Text message handling
 	- Delete first text message
 	
 	- Transform text message to upper case
 
-	- send Wait! preloader message
+	- Send "Wait!" preloader message
 
 	- Save preloader id in object property
 
 	- Find out which method should work, if mode:
-
 		- play:
-
+		
 		- addNewWord:
+			- Delete all messages for this mode
+			
+			- Find user words by id
+			
+			- If new word exists in words:
+				- Reply with message "This word already exists"
+				
+				- Save message id for this mode
+				
+				- Delete preloader message
+			
+			- If new word doesn't exist in English dictionary:
+				- Reply with message "This word doesn't exists on English dictionary"
+
+				- Save message id for this mode
+				
+				- Delete preloader message
+
+			- Creat new word
+			
+			- Sort words by showTime
+
+			- Reply with message "This word successfully saved!"
+
+			- Delete preloader
 
 		- chatgpt:
-
+			- 
 		- translate:
+			- Delete all messages for this mode
+			
+			- Fetch definition for this word
+
+			- Reply with message "definition"
+
+			-  Save message id for this mode
+
+			- delete preloader
 	
 	otherwise just remove text message and preloader message.
 
 3. Menu buttons handling
 	- Remove all messages by mode and reset properties
 
-	- set new mode
+	- Set new mode
 
-	- send buton and send exclamatory message for new mode and save messages 
+	- Send buton and send exclamatory message for new mode and save messages 
 	id in changeMode array
 
 	- In addition for each mode:
-
 		- play:
 			- Find user from database by id
-
+			
 			- Assign user's words
-
+			
 			- Take lastWord
-
+			
 			- Check if lastWord doesn't exists 
 			or last words showTime property more than current timestamp return 
 			message Now no word available!"
-
+			
 			- Send word to user and showDefineButton and messages id in play array
-
 		- addNewWord:
 			over
 		- chatgpt:
 			over
 		- translate:
 			over
+
+4.Show definition button handler
+	- Call translateHanler function with showDefineButton
+
+5.Statistics buttons handlers
+	- Find telegram user from database
+	- Add show time from now depends on which level choosen
+	- Save words and continue play
+	- If pressed button remove find user's words and remove.
