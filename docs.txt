@@ -99,4 +99,4 @@
 	- Find telegram user from database
 	- Add show time from now depends on which level choosen
 	- Save words and continue play
-	- If pressed button remove find user's words and remove.
+	- If pressed button remove find user's words and remove
